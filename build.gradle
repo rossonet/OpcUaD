@@ -6,25 +6,17 @@ buildscript {
   }
   dependencies {
     classpath "com.gorylenko.gradle-git-properties:gradle-git-properties:2.4.0"
-    classpath 'com.netflix.nebula:gradle-ospackage-plugin:8.4.1'
     classpath 'de.undercouch:gradle-download-task:3.1.1'
-    classpath 'gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0'
-    classpath "com.palantir.gradle.docker:gradle-docker:0.32.0"
   }
 }
 
- plugins {
-    id 'org.graalvm.buildtools.native' version '0.9.14'
- }
-
-description = "agent template project"
-group = 'org.rossonet.agent'
-version = '0.0.1'
+description = "Server OPCUA Rossonet with rules engine, Digital Twins support and Neo4J backend"
+group = 'net.rossonet.opcuad'
+version = '0.0.2'
 
 ext {
 	sourceCompatibility = 1.8
-	debianName = "${project.name}"
-	packageName = "${project.name}"
+	targetCompatibility = 1.8
 	ossrhPassword = System.getenv('OSSRH_PASSWORD')
 }
 
@@ -33,27 +25,10 @@ repositories {
 	jcenter()
 }
 
-apply plugin: 'com.palantir.docker'
 apply plugin: 'java'
-apply plugin: 'java-library'
 apply plugin: 'eclipse'
 apply plugin: "com.gorylenko.gradle-git-properties"
-apply plugin: 'jacoco'
-apply plugin: "nebula.rpm"
-apply plugin: 'nebula.deb'
 apply plugin: 'base'
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'distribution'
-apply plugin: 'signing'
-apply plugin: 'maven-publish'
-apply plugin: 'application'
-
-dependencies {
-  api group: 'org.json', name: 'json', version: '20211205'
-  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-  testImplementation group: 'com.ginsberg', name: 'junit5-system-exit', version: '1.1.2'
-  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-}
 
 task eclipseClosedDependencies {}
 
@@ -66,60 +41,7 @@ eclipse {
 	}
 }
 
-docker {
-  name "rossonet/${project.name}:latest"
-  dockerfile file('Dockerfile.gradle')
-  files "$buildDir/libs/${project.name}-${version}-all.jar"
-}
-
 task view { doLast { println "Working on project ${project.name} [ ${project.description} ]" } }
-
-jar {
-  manifest {
-    attributes 'Main-Class': 'org.rossonet.agent.MainAgent'
-  }
-  enabled = true
-}
-
-jar.doLast { task ->
-	ant.checksum file: task.archivePath
-}
-
-task buildDocker() {
-  group "Docker Container Build"
-  description 'Build Docker image'
-  buildDocker.dependsOn("shadowJar")
-  buildDocker.finalizedBy("docker")
-}
-
-shadowJar {
-  minimize()
-}
-
-java {
-  withJavadocJar()
-  withSourcesJar()
-}
-
-gitProperties {
-	failOnNoGitDirectory = false
-	customProperty 'component', "${project.name}"
-	dateFormat = "yyyy-MM-dd HH:mm:ssZ"
-	dateFormatTimeZone = 'GMT'
-}
-
-task endBootJar {
-	doLast{ println ("You can find the fat jar of ${project.name} in ${jar.archivePath}") }
-}
-
-test {
-  useJUnitPlatform()
-}
-
-javadoc{
-	destinationDir = file("${project.buildDir}/docs/javadoc/${project.name}/")
-	failOnError=false
-}
 
 task theiaIdeBackend(type: Exec) {
         workingDir "./"
@@ -163,72 +85,4 @@ task theiaIdeLocalBrowser(type: Exec) {
         description 'Open browser to local Theia IDE'
         workingDir "./"
         commandLine 'xdg-open', 'http://localhost:3000'
-}
-
-publishing {
-  publications {
-    mavenJava(MavenPublication){
-      artifactId = "${project.name}"
-      from components.java
-      versionMapping {
-        usage('java-api') {
-          fromResolutionOf('runtimeClasspath')
-        }
-        usage('java-runtime') {
-          fromResolutionResult()
-        }
-      }
-      pom {
-        name = "${project.name}"
-        description = "${project.description}"
-        url = 'https://app.rossonet.net/'
-        licenses {
-          license {
-            name = 'GNU AFFERO GENERAL PUBLIC LICENSE 3.0'
-            url = 'https://www.gnu.org/licenses/agpl-3.0.html'
-          }
-        }
-        developers {
-          developer {
-            id = 'ar4k'
-            name = 'Andrea Ambrosini'
-            email = 'andrea.ambrosini@rossonet.org'
-          }
-        }
-        scm {
-          connection = 'scm:git:git://github.com/rossonet/TemplateEdgeAgentAr4k.git'
-          developerConnection = 'scm:git:ssh://github.com:rossonet/TemplateEdgeAgentAr4k.git'
-          url = 'https://github.com/rossonet/TemplateEdgeAgentAr4k/tree/master'
-        }
-      }
-    }
-  }
-  repositories {
-    maven {
-      url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-      name = "sonatype"
-      credentials {
-        username "rossonet"
-        password "${ossrhPassword}"
-      }
-    }
-  }
-}
-
-signing {
-    sign publishing.publications.mavenJava
-}
-
-application {
-    mainClass = 'org.rossonet.agent.MainAgent'
-}
-
-graalvmNative {
-    toolchainDetection = false
-    binaries {
-        main {
-            verbose = true
-            sharedLibrary = false
-        }
-    }
 }

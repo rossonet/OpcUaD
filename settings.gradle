@@ -1,0 +1,23 @@
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == 'io.quarkus') {
+                useModule("io.quarkus:quarkus-gradle-plugin:${requested.version}")
+            }
+        }
+    }
+}
+rootProject.name = 'OpcUaD'
+include 'opcuad'
+include 'opcuad-core-library'
+include 'opcuad-command-line-to-action'
+include 'savumerkki-core'
+rootProject.children.each {project ->
+  switch( project.name ) {
+    case 'savumerkki-core': project.projectDir = new File('opcuad-savumerkki/savumerkki-core'); break
+  }
+} 
