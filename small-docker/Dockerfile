@@ -1,8 +1,8 @@
 FROM ubuntu:20.04 as ar4k-builder
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y openjdk-11-jdk
-COPY .. /ar4kAgent
+COPY . /ar4kAgent
 WORKDIR /ar4kAgent
-RUN chmod +x gradlew
+RUN ls && chmod +x gradlew
 RUN ./gradlew clean :opcuad:distTar -x test -Dorg.gradle.jvmargs="-Xms512M -Xmx4G" --info
 
 FROM ubuntu:20.04
