@@ -1,9 +1,9 @@
 [submodule "opcuad-core-library"]
 	path = opcuad-core-library
-	url = git@github.com:rossonet/ar4k-opcua.git
+	url = https://github.com/rossonet/ar4k-opcua.git
 [submodule "opcuad-command-line-to-action"]
 	path = opcuad-command-line-to-action
-	url = git@github.com:rossonet/command-line-to-action.git
+	url = https://github.com/rossonet/command-line-to-action.git
 [submodule "opcuad-savumerkki"]
 	path = opcuad-savumerkki
 	url = https://github.com/rossonet/Savumerkki
