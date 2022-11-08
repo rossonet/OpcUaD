@@ -6,6 +6,7 @@ RUN chmod +x gradlew
 RUN ./gradlew clean :opcuad:distTar -x test -Dorg.gradle.jvmargs="-Xms512M -Xmx4G" --info
 
 FROM ubuntu:20.04
+ARG MAINTAINER="Andrea Ambrosini <andrea.ambrosini@rossonet.org>"
 RUN apt update && \
 	DEBIAN_FRONTEND=noninteractive apt install -y openjdk-11-jre tar && \
 	apt-get clean && rm -rf /var/lib/apt/lists/*
