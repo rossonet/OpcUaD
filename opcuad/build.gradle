@@ -8,22 +8,16 @@ buildscript {
     classpath "com.gorylenko.gradle-git-properties:gradle-git-properties:2.4.0"
     classpath 'com.netflix.nebula:gradle-ospackage-plugin:8.4.1'
     classpath 'de.undercouch:gradle-download-task:3.1.1'
-    classpath 'gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0'
-    classpath "com.palantir.gradle.docker:gradle-docker:0.32.0"
   }
 }
-
- plugins {
-    id 'org.graalvm.buildtools.native' version '0.9.14'
- }
 
 description = rootProject.description
 group = rootProject.group
 version = rootProject.version
 
 ext {
-	sourceCompatibility = 1.8
-	targetCompatibility = 1.8
+	sourceCompatibility = 11
+	targetCompatibility = 11
 	debianName = "${project.name}"
 	packageName = "${project.name}"
 }
@@ -33,7 +27,6 @@ repositories {
 	jcenter()
 }
 
-apply plugin: 'com.palantir.docker'
 apply plugin: 'java'
 apply plugin: 'java-library'
 apply plugin: 'eclipse'
@@ -42,7 +35,6 @@ apply plugin: 'jacoco'
 apply plugin: "nebula.rpm"
 apply plugin: 'nebula.deb'
 apply plugin: 'base'
-apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'distribution'
 apply plugin: 'signing'
 apply plugin: 'maven-publish'
@@ -50,7 +42,18 @@ apply plugin: 'application'
 
 dependencies {
   implementation project(':opcuad-core-library');
-  implementation 'org.neo4j.driver:neo4j-java-driver:5.2.0'
+  implementation project(':opcuad-command-line-to-action');
+  implementation project(':savumerkki-core');
+  implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
+  implementation 'org.bouncycastle:bcpkix-jdk15on:1.70'
+  implementation 'org.bouncycastle:bcutil-jdk15on:1.70'
+  
+  implementation 'org.neo4j.driver:neo4j-java-driver:4.4.9'
+  implementation 'org.apache.commons:commons-compress:1.22'
+  
+  implementation 'org.slf4j:slf4j-api:2.0.3'
+  implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.3'
+
   testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
   testImplementation group: 'com.ginsberg', name: 'junit5-system-exit', version: '1.1.2'
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
@@ -67,12 +70,6 @@ eclipse {
 	}
 }
 
-docker {
-  name "rossonet/${project.name}:latest"
-  dockerfile file('Dockerfile.gradle')
-  files "$buildDir/libs/${project.name}-${version}-all.jar"
-}
-
 task view { doLast { println "Working on project ${project.name} [ ${project.description} ]" } }
 
 jar {
@@ -86,17 +83,6 @@ jar.doLast { task ->
 	ant.checksum file: task.archivePath
 }
 
-task buildDocker() {
-  group "Docker Container Build"
-  description 'Build Docker image'
-  buildDocker.dependsOn("shadowJar")
-  buildDocker.finalizedBy("docker")
-}
-
-shadowJar {
-  minimize()
-}
-
 java {
   withJavadocJar()
   withSourcesJar()
@@ -107,10 +93,6 @@ gitProperties {
 	customProperty 'component', "${project.name}"
 	dateFormat = "yyyy-MM-dd HH:mm:ssZ"
 	dateFormatTimeZone = 'GMT'
-}
-
-task endBootJar {
-	doLast{ println ("You can find the fat jar of ${project.name} in ${jar.archivePath}") }
 }
 
 test {
@@ -222,14 +204,4 @@ signing {
 
 application {
     mainClass = 'org.rossonet.opcuad.MainRunner'
-}
-
-graalvmNative {
-    toolchainDetection = false
-    binaries {
-        main {
-            verbose = true
-            sharedLibrary = false
-        }
-    }
 }

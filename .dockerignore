@@ -15,7 +15,16 @@ a.*.tmp
 *.crt
 *.key
 *.pem
-vagrant
+package.json
+pnpm-lock.yaml
+pnpmfile.js
+target/
+webpack.config.js
+webpack.generated.js
+frontend
+temp-test-*
+status.json
+opcuad/neo4j-engine
 
 ### OUTPUT ###
 spring-shell.log
@@ -58,3 +67,4 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+vagrant/LabOpenShift/crc-linux-amd64.tar.xz

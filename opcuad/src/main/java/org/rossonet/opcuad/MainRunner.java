@@ -15,6 +15,13 @@ public class MainRunner {
 	private static OpcUaServerConfiguration opcServerConfiguration;
 
 	private static Ar4kOpcUaServer server = null;
+	/*
+	 * static { Security.addProvider(new BouncyCastleProvider());
+	 * System.out.println("* providers"); for (final Provider p :
+	 * Security.getProviders()) { System.out.println("\t- " + p.getName()); }
+	 * System.out.println("* algorithms"); for (final String a :
+	 * Security.getAlgorithms("Signature")) { System.out.println("\t- " + a); } }
+	 */
 
 	public static OpcUaServerConfiguration getOpcServerConfiguration() {
 		return opcServerConfiguration;

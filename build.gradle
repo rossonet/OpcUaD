@@ -12,11 +12,11 @@ buildscript {
 
 description = "Server OPCUA Rossonet with rules engine, Digital Twins support and Neo4J backend"
 group = 'net.rossonet.opcuad'
-version = '0.0.2'
+version = '0.0.3'
 
 ext {
-	sourceCompatibility = 1.8
-	targetCompatibility = 1.8
+	sourceCompatibility = 11
+	targetCompatibility = 11
 	ossrhPassword = System.getenv('OSSRH_PASSWORD')
 }
 
