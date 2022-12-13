@@ -51,7 +51,7 @@ dependencies {
   implementation 'org.neo4j.driver:neo4j-java-driver:4.4.9'
   implementation 'org.apache.commons:commons-compress:1.22'
   
-  implementation 'org.slf4j:slf4j-api:2.0.3'
+  implementation 'org.slf4j:slf4j-api:2.0.6'
   implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.3'
 
   testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.1'
